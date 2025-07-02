@@ -46,8 +46,6 @@ jobs:
     - name: 🚀 Deploy to Kubernetes
       env:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
-      run: |
-        echo "$KUBECONFIG" | base64 --decode > kubeconfig.yaml
-        export KUBECONFIG=$PWD/kubeconfig.yaml
-        kubectl apply -f ./Pest-Guard-frontend/frontend-deployment.yaml
-        kubectl apply -f ./Pest-Guard-backend/backend-deployment.yaml
+      
+          kubectl apply -f ./Pest-Guard-frontend/frontend-deployment.yaml
+          kubectl apply -f ./Pest-Guard-backend/backend-deployment.yaml
