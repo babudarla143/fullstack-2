@@ -24,12 +24,12 @@ jobs:
     - name: 🛠️ Build & Push Frontend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest ./Pest-Guard-frontend
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest
+        #docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest
 
     - name: 🛠️ Build & Push Backend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest ./Pest-Guard-backend
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest
+        #docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest
 
     - name: ☸️ Set up kubectl
       uses: azure/setup-kubectl@v3
