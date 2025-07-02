@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+ultralytics
+segment-anything
+opencv-python
+numpy
+python-multipart
+gdown
