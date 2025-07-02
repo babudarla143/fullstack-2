@@ -9,35 +9,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout source code
     - name: ⬇️ Checkout the code
       uses: actions/checkout@v3
 
+    # Step 2: Set up Docker
     - name: 🐳 Set up Docker
       uses: docker/setup-buildx-action@v2
 
+    # Step 3: Login to DockerHub
     - name: 🔐 Login to DockerHub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    # Step 4: Build and (optional) push Frontend Docker image
     - name: 🛠️ Build & Push Frontend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest ./Pest-Guard-frontend
-        #docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest
+        # docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest  # Uncomment to push
 
+    # Step 5: Build and (optional) push Backend Docker image
     - name: 🛠️ Build & Push Backend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest ./Pest-Guard-backend
-        #docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest
+        # docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest   # Uncomment to push
 
+    # Step 6: Install kubectl
     - name: ☸️ Set up kubectl
       uses: azure/setup-kubectl@v3
       with:
         version: v1.26.0
 
+    # Step 7: Deploy to Kubernetes using base64-encoded kubeconfig
     - name: 🚀 Deploy to Kubernetes
       env:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
-          kubectl apply -f ./Pest-Guard-frontend/frontend-deployment.yaml
-          kubectl apply -f ./Pest-Guard-backend/backend-deployment.yaml
+      run: |
+        echo "$KUBECONFIG" | base64 --decode > kubeconfig.yaml
+        export KUBECONFIG=$PWD/kubeconfig.yaml
+        kubectl apply -f ./Pest-Guard-frontend/frontend-deployment.yaml
+        kubectl apply -f ./Pest-Guard-backend/backend-deployment.yaml
