@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout source code
+    # Step 1: Checkout the code
     - name: ⬇️ Checkout the code
       uses: actions/checkout@v3
 
@@ -24,17 +24,17 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    # Step 4: Build and (optional) push Frontend Docker image
+    # Step 4: Build & (optionally) Push Frontend Docker image
     - name: 🛠️ Build & Push Frontend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest ./Pest-Guard-frontend
-        # docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest  # Uncomment to push
+        # docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest
 
-    # Step 5: Build and (optional) push Backend Docker image
+    # Step 5: Build & (optionally) Push Backend Docker image
     - name: 🛠️ Build & Push Backend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest ./Pest-Guard-backend
-        # docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest   # Uncomment to push
+        # docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest
 
     # Step 6: Install kubectl
     - name: ☸️ Set up kubectl
@@ -42,10 +42,12 @@ jobs:
       with:
         version: v1.26.0
 
-    # Step 7: Deploy to Kubernetes using base64-encoded kubeconfig
+    # Step 7: Deploy to Kubernetes
     - name: 🚀 Deploy to Kubernetes
       env:
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
-      
-          kubectl apply -f ./Pest-Guard-frontend/frontend-deployment.yaml
-          kubectl apply -f ./Pest-Guard-backend/backend-deployment.yaml
+        KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+      run: |
+        echo "$KUBECONFIG_DATA" | base64 --decode > kubeconfig.yaml
+        export KUBECONFIG=$PWD/kubeconfig.yaml
+        kubectl apply -f ./Pest-Guard-frontend/frontend-deployment.yaml
+        kubectl apply -f ./Pest-Guard-backend/backend-deployment.yaml
