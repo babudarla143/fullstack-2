@@ -1,0 +1,41 @@
+name: CI/CD pipeline
+on: 
+  push: 
+    branches: [ main ]
+
+jobs: 
+  build-and-deploy:
+    runs-on: ubuntu-latest	
+
+
+    steps:
+    - name: checkou the code
+      uses: actions/checkout@v3
+
+    - name: set up Docker
+      uses: docker/setup-buildx-actions@v2
+      with:
+        username: ${{secrite.DOCKER_USERNAME}}
+        password: ${{secrete.DOCKER_TOKEN}}
+    
+   - name: build the images and push 
+       run: |
+         docker build -t {{secrete.DOCKER_USERNAME}}/pest-frontend:latest ./Pest-Guard-frontend
+        # docker push ${{secrete.USERNAME}}/pest-frontend:latest
+
+   - name: build and push backendimages
+       run: |
+         docker build -t {{secrete.DOCKER_USERNAME}}/pest-backend:latest ./Pest-Guard-backend
+        # docker push {{DOCKER_USERNAME}}/pest-backend:latest
+
+   - name: setup kubectl 
+     uses: azure/setup-kubectl@v3
+     with:
+       vesrion: v1.26.0
+
+   - name: deploy in kuburneties	
+     env:
+       KUBURCONFIG: {{secrete.KUBERCONFIG}}
+     run: |
+       kubectl delete -f  ./Pest-Guard-frontend/frontend-deployment.yaml
+       kubectl delete -f  ./Pest-Guard-backend/backend_deployment.yaml
