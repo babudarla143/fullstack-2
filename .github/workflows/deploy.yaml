@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main , master] 
+    branches: [main, master]
 
 jobs:
   build-and-deploy:
@@ -24,12 +24,12 @@ jobs:
     - name: 🛠️ Build & Push Frontend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest ./Pest-Guard-frontend
-        #docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-frontend:latest
 
     - name: 🛠️ Build & Push Backend Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest ./Pest-Guard-backend
-        #docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pest-backend:latest
 
     - name: ☸️ Set up kubectl
       uses: azure/setup-kubectl@v3
@@ -40,5 +40,7 @@ jobs:
       env:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
       run: |
+        echo "$KUBECONFIG" | base64 --decode > kubeconfig.yaml
+        export KUBECONFIG=$PWD/kubeconfig.yaml
         kubectl apply -f ./Pest-Guard-frontend/frontend-deployment.yaml
         kubectl apply -f ./Pest-Guard-backend/backend-deployment.yaml
